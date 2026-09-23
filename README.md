@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Golf Charity Platform
 
-## Getting Started
+A full-stack web application where golfers track scores, participate in prize draws, and support charities.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js 16** - React framework with App Router
+- **Supabase** - PostgreSQL database & authentication
+- **Stripe** - Payment processing
+- **Tailwind CSS v4** - Styling
+- **TypeScript** - Type safety
+
+## Features
+
+- 🏌️ Golf score tracking (Stableford format)
+- 🎯 Monthly prize draws
+- 💳 Subscription management ($29.99/month or $299.99/year)
+- ❤️ Charity donations (20% of proceeds)
+- 👨‍💼 Admin dashboard
+- 🌓 Dark/light mode
+
+## Quick Start
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Set Up Environment Variables
+
+Copy `.env.local.example` to `.env.local` and fill in:
+
+```env
+# Supabase (get from supabase.com/dashboard)
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Stripe (get from stripe.com/dashboard)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 3. Set Up Database
+
+1. Create a Supabase project
+2. Run `supabase-schema.sql` in SQL Editor
+3. Activate charities: `UPDATE charities SET is_active = true;`
+4. Disable email confirmation: Auth > Settings > uncheck "Enable email confirmations"
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Testing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Create Admin Account
+1. Sign up with email/password
+2. Select "Admin" role during signup
+3. Access admin dashboard at `/admin`
 
-## Learn More
+### Test Subscription (Local)
+1. Use Stripe test card: `4242 4242 4242 4242`
+2. After payment, click "Verify Subscription" on success page
+3. Or run Stripe CLI: `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
 
-To learn more about Next.js, take a look at the following resources:
+## Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+├── (auth)/          # Login & signup
+├── admin/           # Admin dashboard
+├── api/             # API routes
+├── dashboard/       # User dashboard
+└── subscribe/       # Subscription flow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+components/          # Reusable components
+lib/                 # Utilities & clients
+├── supabase/       # Database clients
+├── auth.ts         # Auth helpers
+├── draw-engine.ts  # Prize draw logic
+└── stripe.ts       # Payment integration
+```
 
-## Deploy on Vercel
+## How It Works
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### For Users
+1. Sign up and select a charity
+2. Subscribe (monthly/yearly)
+3. Submit 5 golf scores
+4. Automatically entered in monthly draws
+5. Win prizes, support charities
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### For Admins
+1. Create monthly draw
+2. Execute draw (generates winners)
+3. Verify winners
+4. Mark payments as completed
+
+### Prize Distribution
+- **5 matches**: 40% of pool + jackpot
+- **4 matches**: 35% of pool
+- **3 matches**: 25% of pool
+
+## Deployment
+
+### Vercel
+1. Push to GitHub
+2. Import in Vercel
+3. Add environment variables
+4. Deploy
+
+Update `NEXT_PUBLIC_APP_URL` and configure Stripe webhook with production URL.
+
+## Common Issues
+
+**Subscription not activating?**
+- Ensure Stripe webhook is configured
+- Use Stripe CLI for local testing
+- Or click "Verify Subscription" button
+
+**Scores not in draw?**
+- Must have exactly 5 scores
+- Scores must be 1-45
+- Active subscription required
+
+**Dark mode not working?**
+- Clear browser localStorage
+- Check ThemeProvider in app
+
+## License
+
+Private and proprietary.
