@@ -47,8 +47,8 @@ export default async function AdminDashboardPage() {
     .eq('status', 'active');
 
   // Calculate total revenue (simplified)
-  const monthlyRevenue = allSubscriptions?.filter(s => s.plan_type === 'monthly').length * 29.99 || 0;
-  const yearlyRevenue = allSubscriptions?.filter(s => s.plan_type === 'yearly').length * 299.99 || 0;
+  const monthlyRevenue = (allSubscriptions?.filter(s => s.plan_type === 'monthly').length || 0) * 29.99;
+  const yearlyRevenue = (allSubscriptions?.filter(s => s.plan_type === 'yearly').length || 0) * 299.99;
   const totalRevenue = monthlyRevenue + yearlyRevenue;
 
   const { data: draws } = await supabase

@@ -63,13 +63,17 @@ export async function POST(request: Request) {
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         
+        // Type assertion for accessing period properties
+        const periodStart = 'current_period_start' in subscription ? (subscription as any).current_period_start : Date.now() / 1000;
+        const periodEnd = 'current_period_end' in subscription ? (subscription as any).current_period_end : Date.now() / 1000;
+        
         // Update subscription status
         await supabase
           .from('subscriptions')
           .update({
             status: subscription.status === 'active' ? 'active' : 'inactive',
-            current_period_start: new Date(subscription.current_period_start * 1000).toISOString(),
-            current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+            current_period_start: new Date(periodStart * 1000).toISOString(),
+            current_period_end: new Date(periodEnd * 1000).toISOString(),
           })
           .eq('stripe_subscription_id', subscription.id);
         break;
@@ -91,16 +95,20 @@ export async function POST(request: Request) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         
-        if (invoice.subscription) {
+        const invoiceSubscription = 'subscription' in invoice ? invoice.subscription : null;
+        const periodStart = 'period_start' in invoice ? (invoice as any).period_start : Date.now() / 1000;
+        const periodEnd = 'period_end' in invoice ? (invoice as any).period_end : Date.now() / 1000;
+        
+        if (invoiceSubscription) {
           // Update subscription period
           await supabase
             .from('subscriptions')
             .update({
               status: 'active',
-              current_period_start: new Date(invoice.period_start * 1000).toISOString(),
-              current_period_end: new Date(invoice.period_end * 1000).toISOString(),
+              current_period_start: new Date(periodStart * 1000).toISOString(),
+              current_period_end: new Date(periodEnd * 1000).toISOString(),
             })
-            .eq('stripe_subscription_id', invoice.subscription as string);
+            .eq('stripe_subscription_id', invoiceSubscription as string);
         }
         break;
       }
@@ -108,14 +116,16 @@ export async function POST(request: Request) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         
-        if (invoice.subscription) {
+        const invoiceSubscription = 'subscription' in invoice ? invoice.subscription : null;
+        
+        if (invoiceSubscription) {
           // Mark subscription as past_due
           await supabase
             .from('subscriptions')
             .update({
               status: 'past_due',
             })
-            .eq('stripe_subscription_id', invoice.subscription as string);
+            .eq('stripe_subscription_id', invoiceSubscription as string);
         }
         break;
       }

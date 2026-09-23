@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 
-export default function SubscriptionSuccessPage() {
+function SubscriptionSuccessContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const searchParams = useSearchParams();
@@ -130,5 +130,17 @@ export default function SubscriptionSuccessPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function SubscriptionSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    }>
+      <SubscriptionSuccessContent />
+    </Suspense>
   );
 }

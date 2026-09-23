@@ -34,6 +34,10 @@ export async function POST(request: Request) {
       // Retrieve the Stripe subscription to get period dates
       const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
+      // Type assertion for accessing period properties
+      const periodStart = 'current_period_start' in stripeSubscription ? (stripeSubscription as any).current_period_start : Date.now() / 1000;
+      const periodEnd = 'current_period_end' in stripeSubscription ? (stripeSubscription as any).current_period_end : Date.now() / 1000;
+
       // Update subscription in database
       const { data: subscription, error: subError } = await supabase
         .from('subscriptions')
@@ -41,8 +45,8 @@ export async function POST(request: Request) {
           status: 'active',
           stripe_subscription_id: stripeSubscriptionId,
           stripe_customer_id: stripeCustomerId,
-          current_period_start: new Date(stripeSubscription.current_period_start * 1000).toISOString(),
-          current_period_end: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
+          current_period_start: new Date(periodStart * 1000).toISOString(),
+          current_period_end: new Date(periodEnd * 1000).toISOString(),
         })
         .eq('user_id', user.id)
         .select()

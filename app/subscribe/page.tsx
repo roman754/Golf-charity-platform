@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { motion } from 'framer-motion';
 import { Check, Loader2 } from 'lucide-react';
@@ -8,7 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export default function SubscribePage() {
+function SubscribeContent() {
   const [loading, setLoading] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -199,5 +199,17 @@ export default function SubscribePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SubscribePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+      </div>
+    }>
+      <SubscribeContent />
+    </Suspense>
   );
 }

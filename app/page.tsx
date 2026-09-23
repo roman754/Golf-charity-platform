@@ -438,13 +438,13 @@ export default function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
                 whileHover={{ 
                   scale: 1.05,
                   rotateY: 8,
                   rotateX: 8,
                 }}
                 transition={{ 
+                  delay: index * 0.2,
                   type: "spring",
                   stiffness: 600,
                   damping: 20
@@ -556,16 +556,11 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 600, damping: 20 }}
               whileHover={{ 
                 scale: 1.05,
                 rotateY: 8,
                 rotateX: 8,
-              }}
-              transition={{ 
-                type: "spring",
-                stiffness: 600,
-                damping: 20
               }}
               style={{ 
                 transformStyle: 'preserve-3d',
@@ -597,16 +592,11 @@ export default function HomePage() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 600, damping: 20 }}
               whileHover={{ 
                 scale: 1.05,
                 rotateY: 8,
                 rotateX: 8,
-              }}
-              transition={{ 
-                type: "spring",
-                stiffness: 600,
-                damping: 20
               }}
               style={{ 
                 transformStyle: 'preserve-3d',

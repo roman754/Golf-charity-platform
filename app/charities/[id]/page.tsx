@@ -98,7 +98,7 @@ export default async function CharityDetailPage({
                 Upcoming Events
               </h3>
               <ul className="space-y-3">
-                {charity.upcoming_events.map((event, index) => (
+                {charity.upcoming_events.map((event: string, index: number) => (
                   <li
                     key={index}
                     className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-700"
